@@ -21,9 +21,10 @@ io.on('connection', function(socket) {
     // socket.broadcast.emit from admin to new user
     socket.broadcast.emit('newMessage', makeMessage('Admin', 'New User Joined'));
     
-    socket.on('createMessage', function(newMessage){
+    socket.on('createMessage', function(newMessage, cb){
         console.log('createMessage', newMessage);
         io.emit('newMessage', makeMessage(newMessage.from, newMessage.text));
+        cb('This is from the server');
 //        socket.broadcast.emit('newMessage', {
 //            from: newMessage.from,
 //            text: newMessage.text,
