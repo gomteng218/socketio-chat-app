@@ -3,7 +3,7 @@ var http = require('http');
 var path = require('path');
 var socketIO = require('socket.io');
 
-var makeMessage = require('./utils/message');
+var {makeMessage, makeLocationMessage} = require('./utils/message');
 var publicPath = path.join(__dirname, '../public');
 var port = process.env.PORT || 3000;
 var app = express();
@@ -25,11 +25,10 @@ io.on('connection', function(socket) {
         console.log('createMessage', newMessage);
         io.emit('newMessage', makeMessage(newMessage.from, newMessage.text));
         cb('This is from the server');
-//        socket.broadcast.emit('newMessage', {
-//            from: newMessage.from,
-//            text: newMessage.text,
-//            createdAt: new Date().getTime()
-//        });
+    });
+    
+    socket.on('createLocationMessage', function(coords) {
+        io.emit('newLocationMessage', makeLocationMessage('Admin', coords.latitude, coords.longitude));
     });
     
     socket.on('disconnect', function() {
