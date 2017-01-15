@@ -24,7 +24,7 @@ io.on('connection', function(socket) {
     socket.on('createMessage', function(newMessage, cb){
         console.log('createMessage', newMessage);
         io.emit('newMessage', makeMessage(newMessage.from, newMessage.text));
-        cb('This is from the server');
+        cb();
     });
     
     socket.on('createLocationMessage', function(coords) {
