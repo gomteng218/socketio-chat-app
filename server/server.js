@@ -4,6 +4,7 @@ var path = require('path');
 var socketIO = require('socket.io');
 
 var {makeMessage, makeLocationMessage} = require('./utils/message');
+var {isValidStr} = require('./utils/validation');
 var publicPath = path.join(__dirname, '../public');
 var port = process.env.PORT || 3000;
 var app = express();
@@ -15,11 +16,21 @@ app.use(express.static(publicPath));
 io.on('connection', function(socket) {
     console.log('New user connected');
     
-    // socket.emit from admin / welcome text
-    socket.emit('newMessage', makeMessage('Admin', 'Welcome to the chat room!'));
+    socket.on('join', function(params, cb) {
+        if (!isValidStr(params.name) || !isValidStr(params.room)) {
+            cb('Name and Room Name are required!')
+        }
+        
+        socket.join(params.room);
+        
+        
+        // socket.emit from admin / welcome text
+        socket.emit('newMessage', makeMessage('Admin', 'Welcome to the chat room!'));
     
-    // socket.broadcast.emit from admin to new user
-    socket.broadcast.emit('newMessage', makeMessage('Admin', 'New User Joined'));
+        // socket.broadcast.emit from admin to new user
+        socket.broadcast.to(params.room).emit('newMessage', makeMessage('Admin', params.name + ' has joined.'));
+        cb();
+    });
     
     socket.on('createMessage', function(newMessage, cb){
         console.log('createMessage', newMessage);
